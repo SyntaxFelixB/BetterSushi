@@ -44,7 +44,8 @@ fun QuantitySelector(
             label = ""
         ) {
             NormalText(
-                text = "$it"
+                text = "$it",
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
         IconButton(

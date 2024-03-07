@@ -1,68 +1,83 @@
 package de.syntax_institut.bettersushi.ui.navigation
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import de.syntax_institut.bettersushi.domain.CostOverviewViewModel
 import de.syntax_institut.bettersushi.domain.DishViewModel
-import de.syntax_institut.bettersushi.domain.RestaurantViewModel
+import de.syntax_institut.bettersushi.ui.components.NormalText
 import de.syntax_institut.bettersushi.ui.screens.CostOverviewScreen
 import de.syntax_institut.bettersushi.ui.screens.DishOverviewScreen
-import de.syntax_institut.bettersushi.ui.screens.LandingScreen
 
 @Composable
-fun AppNavigation() {
-    val navController = rememberNavController()
-    val restaurantViewModel: RestaurantViewModel = viewModel()
-    val dishViewModel: DishViewModel = viewModel()
-    val costOverviewViewModel: CostOverviewViewModel = viewModel()
-    val tableFound by restaurantViewModel.foundTable.collectAsState()
+fun AppNavigation(
+    dishViewModel: DishViewModel,
+    costOverviewViewModel: CostOverviewViewModel
+) {
+    val navController: NavHostController = rememberNavController()
 
     Scaffold(
         bottomBar = {
-            if(tableFound) {
-                BottomNavBar(navController)
+            NavigationBar {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
+
+                navItems.forEach { navItem ->
+                    NavigationBarItem(
+                        selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
+                        onClick = {
+                                  navController.navigate(navItem.route) {
+                                      popUpTo(navController.graph.findStartDestination().id) {
+                                          saveState = true
+                                      }
+                                      launchSingleTop = true
+                                      restoreState = true
+                                  }
+                        },
+                        icon = {
+                            Icon(
+                               imageVector = navItem.icon,
+                               contentDescription = null
+                           )
+                        },
+                        label = {
+                            NormalText(
+                                text = navItem.label
+                            )
+                        }
+                    )
+                }
             }
         }
-    ) { innerPadding ->
+    ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Landing.route,
-            modifier = Modifier.padding(innerPadding)
+            startDestination = Screens.DishOverviewScreen.name,
+            modifier = Modifier.padding(paddingValues)
         ) {
-            composable(Screen.Landing.route) {
-                LandingScreen(
-                    navController,
-                    restaurantViewModel,
-                    dishViewModel
-                )
-            }
-            composable(Screen.Dishes.route) {
+            composable(Screens.DishOverviewScreen.name) {
                 DishOverviewScreen(
-                    navController,
                     costOverviewViewModel,
                     dishViewModel
                 )
             }
-            composable(Screen.CostOverview.route) {
+            composable(Screens.CostOverviewScreen.name) {
                 CostOverviewScreen(
-                    navController,
                     costOverviewViewModel
                 )
             }
         }
     }
-}
-
-sealed class Screen(val route: String) {
-    data object Landing : Screen("Landing")
-    data object Dishes : Screen("Dishes")
-    data object CostOverview : Screen("Pay")
 }

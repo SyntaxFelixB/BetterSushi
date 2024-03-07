@@ -32,13 +32,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import de.syntax_institut.bettersushi.R
 import de.syntax_institut.bettersushi.domain.CostOverviewViewModel
 import de.syntax_institut.bettersushi.ui.components.DishRowItem
 import de.syntax_institut.bettersushi.ui.components.NormalText
-import de.syntax_institut.bettersushi.ui.components.QuantitySelector
 import de.syntax_institut.bettersushi.ui.components.TitleText
 import de.syntax_institut.bettersushi.ui.theme.BetterSushiTheme
 import de.syntax_institut.bettersushi.util.formatPrice
@@ -47,7 +44,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CostOverviewScreen(
-    navController: NavController,
     costOverviewViewModel: CostOverviewViewModel
 ) {
     val dishes by costOverviewViewModel.orderedDishes.collectAsState()
@@ -62,18 +58,20 @@ fun CostOverviewScreen(
                 .padding(paddingValues)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.dish_bg),
+                painter = painterResource(id = R.drawable.costoverview_bg),
                 contentDescription = "Background",
                 contentScale = ContentScale.FillHeight,
                 modifier = Modifier
-                    .blur(2.dp)
+                    .blur(40.dp)
                     .matchParentSize()
             )
         }
         Column(
             Modifier.fillMaxSize()
         ) {
-            LazyColumn {
+            LazyColumn(
+                Modifier.padding(top = 16.dp).weight(30f)
+            ) {
                 items(dishes.keys.toList()) { dish ->
                     DishRowItem(
                         dish = dish,
@@ -81,19 +79,26 @@ fun CostOverviewScreen(
                         Row(
                             Modifier.width(100.dp)
                         ) {
-                            NormalText("x${dishes[dish]}")
+                            NormalText(
+                                "x${dishes[dish]}",
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
                             Spacer(Modifier.weight(1f))
-                            NormalText(formatPrice(dishes[dish]!! * dish.price))
+                            NormalText(
+                                formatPrice(dishes[dish]!! * dish.price),
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     }
                 }
             }
             Spacer(Modifier.weight(1f))
             Button(
+                enabled = costOverviewViewModel.getTotalPrice() > 0,
                 onClick = {
                     showBottomSheet = true
                 },
-                Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
             ) {
@@ -165,6 +170,6 @@ fun CostOverviewScreen(
 @Composable
 fun CostOverviewPreview() {
     BetterSushiTheme {
-        CostOverviewScreen(rememberNavController(), viewModel())
+        CostOverviewScreen(viewModel())
     }
 }

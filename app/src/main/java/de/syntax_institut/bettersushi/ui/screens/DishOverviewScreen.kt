@@ -1,6 +1,8 @@
 package de.syntax_institut.bettersushi.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,16 +15,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.layout.ContentScale
@@ -30,18 +35,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import de.syntax_institut.bettersushi.R
 import de.syntax_institut.bettersushi.domain.CostOverviewViewModel
 import de.syntax_institut.bettersushi.domain.DishViewModel
+import de.syntax_institut.bettersushi.ui.components.ConfirmationWindow
 import de.syntax_institut.bettersushi.ui.components.DishRowItem
 import de.syntax_institut.bettersushi.ui.components.NormalText
 import de.syntax_institut.bettersushi.ui.components.QuantitySelector
+import de.syntax_institut.bettersushi.util.formatPrice
 
 @Composable
 fun DishOverviewScreen(
-    navController: NavController,
     costOverviewViewModel: CostOverviewViewModel,
     dishViewModel: DishViewModel,
 ) {
@@ -49,6 +53,7 @@ fun DishOverviewScreen(
     val dishes by dishViewModel.dishes.collectAsState()
     val cart by dishViewModel.cart.collectAsState()
     val scrollState = rememberLazyListState()
+    var showConfirmation by remember { mutableStateOf(false) }
 
     Scaffold { paddingValues ->
         Box(
@@ -61,10 +66,11 @@ fun DishOverviewScreen(
                 contentDescription = "Background",
                 contentScale = ContentScale.FillHeight,
                 modifier = Modifier
-                    .blur(2.dp)
+                    .blur(40.dp)
                     .matchParentSize()
             )
         }
+
         Column(
             Modifier.fillMaxWidth()
         ) {
@@ -74,23 +80,39 @@ fun DishOverviewScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    itemsIndexed(categories) { index, image ->
+                    items(categories) { category ->
                         Card(
-                            modifier = Modifier.height(100.dp),
+                            modifier = Modifier
+                                .height(120.dp)
+                                .clickable {
+                                    dishViewModel.setCurrentCategory(category)
+                                },
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = 8.dp
                             )
                         ) {
-                            Image(
-                                painterResource(id = image.value),
-                                contentDescription = "Image",
-                                contentScale = ContentScale.FillBounds,
-                                modifier = Modifier.width(100.dp)
-                            )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.background(MaterialTheme.colorScheme.onPrimary)
+                            ) {
+                                Image(
+                                    painterResource(id = category.value),
+                                    contentDescription = "Image",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier
+                                        .width(120.dp)
+                                        .weight(10f)
+                                )
+                                NormalText (
+                                    text = category.name,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
                         }
                     }
                 }
             }
+
             LazyColumn {
                 items(dishes) { dish ->
                     DishRowItem(
@@ -104,16 +126,31 @@ fun DishOverviewScreen(
                     }
                 }
             }
+
             Spacer(Modifier.weight(1f))
             Button(
+                enabled = !cart.isEmpty(),
                 onClick = {
-                    costOverviewViewModel.addOrder(dishViewModel.clearCart())
+                    showConfirmation = true
                 },
-                Modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
             ) {
                 NormalText(text = "Bestellen")
+            }
+        }
+        if(showConfirmation) {
+            ConfirmationWindow(
+                title = "Bestätigen",
+                message = "Bitte bestätigen Sie, das Sie die gewünschten Artikel " +
+                        "für insgesamt ${formatPrice(dishViewModel.getCartValue())} bestellen wollen.",
+                onCancel = {
+                    showConfirmation = false
+                }
+            ) {
+                costOverviewViewModel.addOrder(dishViewModel.clearCart())
+                showConfirmation = false
             }
         }
     }
@@ -122,5 +159,5 @@ fun DishOverviewScreen(
 @Preview
 @Composable
 fun DishOverviewPreview() {
-    DishOverviewScreen(rememberNavController(), viewModel(), viewModel())
+    DishOverviewScreen(viewModel(), viewModel())
 }

@@ -1,8 +1,6 @@
 package de.syntax_institut.bettersushi.domain
 
 import androidx.lifecycle.ViewModel
-import de.syntax_institut.bettersushi.data.model.Category
-import de.syntax_institut.bettersushi.data.model.Dish
 import de.syntax_institut.bettersushi.data.model.Restaurant
 import de.syntax_institut.bettersushi.data.repository.MockupRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +18,9 @@ class RestaurantViewModel : ViewModel() {
         get() = _foundTable
 
     private val _foundRestaurant = MutableStateFlow<Restaurant?>(null)
+    val foundRestaurant: StateFlow<Restaurant?>
+        get() = _foundRestaurant
+
     private val _tables = MutableStateFlow<List<String>>(emptyList())
 
     // TODO: Create selection and remove
@@ -36,12 +37,9 @@ class RestaurantViewModel : ViewModel() {
         }
     }
 
-    fun selectTable(tableID: String, setRestaurant: (Restaurant) -> Unit, ) {
+    fun selectTable(tableID: String) {
         if(_tables.value.contains(tableID)) {
             _foundTable.value = true
-            _foundRestaurant.value?.let { restaurant ->
-                setRestaurant(restaurant)
-            }
         }
     }
 }

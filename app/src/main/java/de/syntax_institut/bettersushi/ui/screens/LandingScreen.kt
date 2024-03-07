@@ -30,21 +30,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import de.syntax_institut.bettersushi.R
-import de.syntax_institut.bettersushi.domain.DishViewModel
 import de.syntax_institut.bettersushi.domain.RestaurantViewModel
 import de.syntax_institut.bettersushi.ui.components.NormalText
 import de.syntax_institut.bettersushi.ui.components.TitleText
-import de.syntax_institut.bettersushi.ui.navigation.Screen
+import de.syntax_institut.bettersushi.ui.navigation.Screens
 import de.syntax_institut.bettersushi.ui.theme.BetterSushiTheme
 
 @Composable
 fun LandingScreen(
-    navController: NavController,
-    restaurantViewModel: RestaurantViewModel,
-    dishViewModel: DishViewModel
+    navController: NavHostController = rememberNavController(),
+    restaurantViewModel: RestaurantViewModel
 ) {
     val maxLength = 4
     var text by remember { mutableStateOf("") }
@@ -53,7 +51,7 @@ fun LandingScreen(
 
     LaunchedEffect(tableFound) {
         if (tableFound) {
-            navController.navigate(Screen.Dishes.route)
+            navController.navigate(Screens.DishOverviewScreen.name)
         }
     }
 
@@ -105,7 +103,7 @@ fun LandingScreen(
             Spacer(Modifier.weight(1f))
             Button(
                 onClick = {
-                    restaurantViewModel.selectTable(text, dishViewModel::setRestaurant)
+                    restaurantViewModel.selectTable(text)
                 },
                 enabled = text.length == maxLength
             ) {
@@ -120,6 +118,6 @@ fun LandingScreen(
 @Composable
 fun LandingScreenPreview() {
     BetterSushiTheme {
-        LandingScreen(rememberNavController(), viewModel(), viewModel())
+        LandingScreen(rememberNavController(), viewModel())
     }
 }

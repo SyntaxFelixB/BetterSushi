@@ -36,6 +36,12 @@ class DishViewModel : ViewModel() {
         return returnMap
     }
 
+    fun getCartValue(): Double {
+        return _cart.value.map { entry ->
+            entry.key.price * entry.value
+        }.sum()
+    }
+
     fun setCurrentCategory(category: Category) {
         _currentCategory.value = category
         _restaurant.value?.let { restaurant ->

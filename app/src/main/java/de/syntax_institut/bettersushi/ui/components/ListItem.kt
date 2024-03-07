@@ -2,6 +2,7 @@ package de.syntax_institut.bettersushi.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -30,7 +31,10 @@ fun DishRowItem(
             NormalText(dish.name)
         },
         supportingContent = {
-            NormalText(formatPrice(dish.price))
+            NormalText(
+                formatPrice(dish.price),
+                color = MaterialTheme.colorScheme.onSecondary
+            )
         },
         leadingContent = {
             Image(
@@ -48,7 +52,9 @@ fun DishRowItem(
             headlineColor = MaterialTheme.colorScheme.onPrimary,
             supportingColor = MaterialTheme.colorScheme.onSecondary
         ),
-        modifier = modifier,
+        modifier = modifier
+            .padding(vertical = 2.dp, horizontal = 16.dp)
+            .clip(MaterialTheme.shapes.medium),
         trailingContent = content
     )
 }

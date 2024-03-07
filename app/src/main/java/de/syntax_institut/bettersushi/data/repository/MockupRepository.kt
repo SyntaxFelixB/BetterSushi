@@ -14,11 +14,11 @@ class MockupRepository : IRepository {
             Dish("Tamago Maki", Category.Sushi, 2.99, R.drawable.sushi_tamago),
             Dish("Reis", Category.Sidedish, 1.99, R.drawable.extra_rice),
             Dish("Wasabi", Category.Sidedish, 0.49, R.drawable.extra_wasabi),
-            Dish("Cola", Category.Drink, 2.39, R.drawable.drink_cola),
-            Dish("Limo", Category.Drink, 2.49, R.drawable.drink_limo),
-            Dish("Kaffee", Category.Drink, 1.49, R.drawable.drink_coffe),
-            Dish("Donut", Category.Desert, 0.99, R.drawable.desert_donut),
-            Dish("Muffin", Category.Desert, 0.99, R.drawable.desert_muffin),
+            Dish("Cola", Category.Drinks, 2.39, R.drawable.drink_cola),
+            Dish("Limo", Category.Drinks, 2.49, R.drawable.drink_limo),
+            Dish("Kaffee", Category.Drinks, 1.49, R.drawable.drink_coffe),
+            Dish("Donut", Category.Deserts, 0.99, R.drawable.desert_donut),
+            Dish("Muffin", Category.Deserts, 0.99, R.drawable.desert_muffin),
         )
     }
 
