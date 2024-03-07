@@ -8,6 +8,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -22,11 +23,10 @@ import de.syntax_institut.bettersushi.ui.screens.CostOverviewScreen
 import de.syntax_institut.bettersushi.ui.screens.DishOverviewScreen
 
 @Composable
-fun AppNavigation(
-    dishViewModel: DishViewModel,
-    costOverviewViewModel: CostOverviewViewModel
-) {
+fun AppNavigation() {
     val navController: NavHostController = rememberNavController()
+    val dishViewModel: DishViewModel = viewModel()
+    val costOverviewViewModel: CostOverviewViewModel = viewModel()
 
     Scaffold(
         bottomBar = {

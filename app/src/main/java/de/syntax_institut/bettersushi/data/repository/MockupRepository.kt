@@ -3,10 +3,9 @@ package de.syntax_institut.bettersushi.data.repository
 import de.syntax_institut.bettersushi.R
 import de.syntax_institut.bettersushi.data.model.Category
 import de.syntax_institut.bettersushi.data.model.Dish
-import de.syntax_institut.bettersushi.data.model.Restaurant
 
-class MockupRepository : IRepository {
-    override fun getDishes(): List<Dish> {
+class MockupRepository {
+    fun getDishes(): List<Dish> {
         return listOf(
             Dish("Lachs Maki", Category.Sushi, 3.99, R.drawable.sushi_sake),
             Dish("Thunfisch Maki", Category.Sushi, 2.99, R.drawable.sushi_tuna),
@@ -22,17 +21,14 @@ class MockupRepository : IRepository {
         )
     }
 
-    override fun getRestaurants(): List<Restaurant> {
+    fun getCategories(): List<Category> {
+        return Category.entries
+    }
+
+    fun getTables(): List<String> {
         return listOf(
-            Restaurant(
-                "Sushiplace",
-                getDishes(),
-                listOf(
-                    "ABCD",
-                    "1234"
-                ),
-                Category.entries
-            )
+            "ABCD",
+            "1234"
         )
     }
 }
